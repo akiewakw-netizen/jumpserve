@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JumpServe Sport — Спортын хувцасны дэлгүүр</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green: #1D9E75;
+      --green-light: #5DCAA5;
+      --green-pale: #E1F5EE;
+      --green-mid: #9FE1CB;
+      --green-dark: #0F6E56;
+      --green-deep: #085041;
+      --text: #1a1a1a;
+      --text-muted: #6b6b6b;
+      --text-faint: #aaa;
+      --bg: #ffffff;
+      --bg-surface: #f7f7f5;
+      --border: rgba(0,0,0,0.12);
+      --border-mid: rgba(0,0,0,0.22);
+      --radius: 8px;
+      --radius-lg: 12px;
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 32px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--bg);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .logo { font-size: 22px; font-weight: 600; letter-spacing: 0.5px; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--green); }
+    .nav-links { display: flex; gap: 24px; list-style: none; }
+    .nav-links a { font-size: 14px; color: var(--text-muted); text-decoration: none; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-right { display: flex; gap: 10px; align-items: center; }
+    .search-inp {
+      border: 0.5px solid var(--border-mid); border-radius: var(--radius);
+      padding: 8px 14px; font-size: 13px; background: var(--bg-surface);
+      color: var(--text); width: 160px; outline: none;
+    }
+    .search-inp:focus { border-color: var(--green-light); }
+    .btn-cart {
+      background: var(--green); color: var(--green-deep); border: none;
+      border-radius: var(--radius); padding: 8px 18px;
+      font-size: 14px; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; gap: 8px; transition: background .2s;
+    }
+    .btn-cart:hover { background: var(--green-light); }
+    .cart-count {
+      background: var(--green-deep); color: #fff; border-radius: 50%;
+      width: 20px; height: 20px; font-size: 11px;
+      display: inline-flex; align-items: center; justify-content: center; font-weight: 600;
+    }
+
+    /* HERO */
+    .hero {
+      background: var(--bg-surface);
+      padding: 60px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 0.5px solid var(--border);
+      gap: 32px;
+    }
+    .hero-text { max-width: 480px; }
+    .hero-eyebrow {
+      font-size: 12px; font-weight: 600; color: var(--green);
+      text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 12px;
+    }
+    .hero-text h1 {
+      font-size: 42px; font-weight: 700; line-height: 1.15; margin-bottom: 16px; color: var(--text);
+    }
+    .hero-text h1 em { color: var(--green); font-style: normal; }
+    .hero-text p {
+      font-size: 15px; color: var(--text-muted); line-height: 1.7; margin-bottom: 28px;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--green); color: var(--green-deep); border: none;
+      border-radius: var(--radius); padding: 12px 28px;
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: background .2s;
+    }
+    .btn-primary:hover { background: var(--green-light); }
+    .btn-outline {
+      background: transparent; color: var(--text);
+      border: 0.5px solid var(--border-mid); border-radius: var(--radius);
+      padding: 12px 22px; font-size: 14px; cursor: pointer; transition: background .2s;
+    }
+    .btn-outline:hover { background: var(--border); }
+    .hero-stats { display: flex; gap: 14px; flex-shrink: 0; }
+    .stat-card {
+      background: var(--bg); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 24px 28px; text-align: center;
+    }
+    .stat-big { font-size: 38px; font-weight: 700; color: var(--green); }
+    .stat-sm { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+    /* CATEGORY PILLS */
+    .cats {
+      display: flex; gap: 8px; padding: 16px 32px;
+      border-bottom: 0.5px solid var(--border); overflow-x: auto;
+      background: var(--bg);
+    }
+    .cats::-webkit-scrollbar { height: 0; }
+    .cat-pill {
+      border: 0.5px solid var(--border-mid); border-radius: 20px;
+      padding: 7px 18px; font-size: 13px; cursor: pointer;
+      background: var(--bg); color: var(--text-muted); white-space: nowrap;
+      transition: all .2s; font-family: inherit;
+    }
+    .cat-pill.active, .cat-pill:hover {
+      background: var(--green-pale); color: var(--green-deep); border-color: var(--green-mid);
+    }
+
+    /* PRODUCTS */
+    .section { padding: 32px; }
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;
+    }
+    .section-title { font-size: 20px; font-weight: 600; }
+    .see-all {
+      font-size: 13px; color: var(--green); background: none; border: none;
+      cursor: pointer; font-family: inherit; font-weight: 500;
+    }
+    .see-all:hover { color: var(--green-dark); text-decoration: underline; }
+    .products { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 16px; }
+    .prod-card {
+      background: var(--bg); border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg); overflow: hidden; cursor: pointer;
+      transition: border-color .2s, transform .15s;
+    }
+    .prod-card:hover { border-color: var(--green-mid); transform: translateY(-2px); }
+    .prod-img {
+      height: 130px; display: flex; align-items: center; justify-content: center;
+      background: var(--bg-surface); font-size: 52px;
+    }
+    .prod-body { padding: 12px 14px; }
+    .prod-brand { font-size: 11px; color: var(--text-faint); text-transform: uppercase; letter-spacing: .6px; }
+    .prod-name { font-size: 13px; font-weight: 500; margin: 4px 0 8px; line-height: 1.4; }
+    .prod-bottom { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+    .prod-price { font-size: 14px; font-weight: 600; color: var(--green-dark); }
+    .prod-old { font-size: 11px; color: var(--text-faint); text-decoration: line-through; }
+    .badge-sale {
+      background: var(--green-pale); color: var(--green-deep);
+      font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 500;
+    }
+    .add-btn {
+      width: 100%; background: var(--green); color: var(--green-deep);
+      border: none; border-radius: var(--radius); padding: 8px 0;
+      font-size: 13px; font-weight: 500; cursor: pointer; transition: background .2s;
+      font-family: inherit;
+    }
+    .add-btn:hover { background: var(--green-light); }
+    .add-btn.added { background: var(--green-pale); color: var(--green-dark); }
+
+    /* BANNER */
+    .banner {
+      margin: 0 32px 32px;
+      background: var(--green-pale); border: 0.5px solid var(--green-mid);
+      border-radius: var(--radius-lg); padding: 24px 32px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .banner-tag { font-size: 11px; color: var(--green); font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .banner-title { font-size: 22px; font-weight: 600; color: var(--green-deep); margin-top: 4px; }
+    .banner-sub { font-size: 13px; color: var(--green-dark); margin-top: 4px; }
+
+    /* BRANDS */
+    .brands-section { padding: 0 32px 32px; }
+    .brands-grid { display: flex; gap: 12px; flex-wrap: wrap; }
+    .brand-chip {
+      border: 0.5px solid var(--border-mid); border-radius: var(--radius);
+      padding: 10px 20px; font-size: 14px; font-weight: 500; color: var(--text-muted);
+      background: var(--bg); cursor: pointer; transition: all .2s;
+    }
+    .brand-chip:hover { border-color: var(--green-light); color: var(--green-dark); background: var(--green-pale); }
+
+    /* FOOTER */
+    footer {
+      border-top: 0.5px solid var(--border); padding: 24px 32px;
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+      background: var(--bg-surface);
+    }
+    .footer-logo { font-size: 16px; font-weight: 600; color: var(--text-muted); }
+    .footer-logo span { color: var(--green); }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: 13px; color: var(--text-faint); text-decoration: none; }
+    .footer-links a:hover { color: var(--text-muted); }
+    .footer-copy { font-size: 12px; color: var(--text-faint); }
+
+    /* CART SIDEBAR */
+    .cart-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 200;
+    }
+    .cart-overlay.open { display: block; }
+    .cart-drawer {
+      position: fixed; top: 0; right: -420px; width: 380px; height: 100%;
+      background: var(--bg); border-left: 0.5px solid var(--border);
+      z-index: 201; transition: right .3s; display: flex; flex-direction: column;
+    }
+    .cart-drawer.open { right: 0; }
+    .cart-head {
+      padding: 20px 24px; border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cart-head h2 { font-size: 18px; font-weight: 600; }
+    .close-btn {
+      background: none; border: none; font-size: 22px; cursor: pointer; color: var(--text-muted); line-height: 1;
+    }
+    .cart-items { flex: 1; overflow-y: auto; padding: 16px 24px; }
+    .cart-empty { text-align: center; padding: 40px 0; color: var(--text-muted); font-size: 14px; }
+    .cart-item {
+      display: flex; align-items: center; gap: 12px; padding: 12px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    .cart-item-icon { font-size: 32px; width: 50px; height: 50px; background: var(--bg-surface); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .cart-item-info { flex: 1; }
+    .cart-item-name { font-size: 13px; font-weight: 500; }
+    .cart-item-price { font-size: 13px; color: var(--green-dark); margin-top: 2px; }
+    .cart-item-rm { background: none; border: none; color: var(--text-faint); cursor: pointer; font-size: 18px; }
+    .cart-item-rm:hover { color: #E24B4A; }
+    .cart-foot {
+      padding: 16px 24px; border-top: 0.5px solid var(--border);
+    }
+    .cart-total { display: flex; justify-content: space-between; font-size: 15px; font-weight: 600; margin-bottom: 14px; }
+    .btn-checkout {
+      width: 100%; background: var(--green); color: var(--green-deep);
+      border: none; border-radius: var(--radius); padding: 14px;
+      font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; transition: background .2s;
+    }
+    .btn-checkout:hover { background: var(--green-light); }
+
+    @media (max-width: 700px) {
+      .nav { padding: 12px 16px; }
+      .nav-links { display: none; }
+      .hero { flex-direction: column; padding: 32px 16px; }
+      .hero-stats { justify-content: center; }
+      .cats { padding: 12px 16px; }
+      .section { padding: 20px 16px; }
+      .banner { flex-direction: column; margin: 0 16px 24px; }
+      .brands-section { padding: 0 16px 24px; }
+      footer { padding: 20px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="logo" href="#">Jump<span>Serve</span> Sport</a>
+  <ul class="nav-links">
+    <li><a href="#">Эрэгтэй</a></li>
+    <li><a href="#">Эмэгтэй</a></li>
+    <li><a href="#">Хүүхэд</a></li>
+    <li><a href="#">Брэндүүд</a></li>
+    <li><a href="#">Акц</a></li>
+  </ul>
+  <div class="nav-right">
+    <input class="search-inp" placeholder="Бараа хайх..." id="search-inp" />
+    <button class="btn-cart" id="cart-btn">
+      Сагс <span class="cart-count" id="cart-count">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-eyebrow">2026 шинэ коллекц</div>
+    <h1>Спортын хувцас<br><em>шинэ түвшинд</em></h1>
+    <p>Nike, Adidas, Puma болон дэлхийн тэргүүлэх 30 гаруй брэндийн хувцас, гутал, хэрэгсэлийг нэг дороос.</p>
+    <div class="hero-actions">
+      <button class="btn-primary" onclick="document.getElementById('products').scrollIntoView({behavior:'smooth'})">Дэлгүүр үзэх →</button>
+      <button class="btn-outline" onclick="filterCat('Акц')">Хямдралтай бараа</button>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat-card">
+      <div class="stat-big">500+</div>
+      <div class="stat-sm">Бүтээгдэхүүн</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-big">30+</div>
+      <div class="stat-sm">Брэнд</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-big">24h</div>
+      <div class="stat-sm">Хүргэлт</div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<div class="cats" id="cats">
+  <button class="cat-pill active" onclick="filterCat('Бүгд')">Бүгд</button>
+  <button class="cat-pill" onclick="filterCat('Гүйлтийн')">Гүйлтийн</button>
+  <button class="cat-pill" onclick="filterCat('Сагсан бөмбөг')">Сагсан бөмбөг</button>
+  <button class="cat-pill" onclick="filterCat('Хөл бөмбөг')">Хөл бөмбөг</button>
+  <button class="cat-pill" onclick="filterCat('Дайчлалт')">Дайчлалт</button>
+  <button class="cat-pill" onclick="filterCat('Усны спорт')">Усны спорт</button>
+  <button class="cat-pill" onclick="filterCat('Уулын явган')">Уулын явган аялал</button>
+  <button class="cat-pill" onclick="filterCat('Акц')">Акц</button>
+</div>
+
+<!-- PRODUCTS -->
+<section class="section" id="products">
+  <div class="section-header">
+    <span class="section-title" id="section-label">Онцлох бүтээгдэхүүн</span>
+    <button class="see-all">Бүгдийг үзэх →</button>
+  </div>
+  <div class="products" id="prod-grid"></div>
+</section>
+
+<!-- BANNER -->
+<div class="banner">
+  <div>
+    <div class="banner-tag">Онцгой санал</div>
+    <div class="banner-title">Nike Air Max — 20% хямдрал</div>
+    <div class="banner-sub">Зөвхөн энэ долоо хоногт. Хязгаарлагдмал тоо хэмжээ.</div>
+  </div>
+  <button class="btn-primary" onclick="filterCat('Акц')">Дэлгэрэнгүй →</button>
+</div>
+
+<!-- BRANDS -->
+<div class="brands-section">
+  <div class="section-header">
+    <span class="section-title">Брэндүүд</span>
+  </div>
+  <div class="brands-grid">
+    <div class="brand-chip">Nike</div>
+    <div class="brand-chip">Adidas</div>
+    <div class="brand-chip">Puma</div>
+    <div class="brand-chip">Under Armour</div>
+    <div class="brand-chip">New Balance</div>
+    <div class="brand-chip">Reebok</div>
+    <div class="brand-chip">Asics</div>
+    <div class="brand-chip">Salomon</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Jump<span>Serve</span> Sport</div>
+  <div class="footer-links">
+    <a href="#">Бидний тухай</a>
+    <a href="#">Хүргэлт</a>
+    <a href="#">Буцаалт</a>
+    <a href="#">Холбоо барих</a>
+    <a href="#">Нууцлал</a>
+  </div>
+  <div class="footer-copy">© 2026 JumpServe Sport. Бүх эрх хамгаалагдсан.</div>
+</footer>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cart-drawer">
+  <div class="cart-head">
+    <h2>Миний сагс</h2>
+    <button class="close-btn" onclick="closeCart()">×</button>
+  </div>
+  <div class="cart-items" id="cart-items">
+    <div class="cart-empty" id="cart-empty">Сагс хоосон байна</div>
+  </div>
+  <div class="cart-foot">
+    <div class="cart-total">
+      <span>Нийт дүн:</span>
+      <span id="cart-total">₮0</span>
+    </div>
+    <button class="btn-checkout">Захиалга өгөх →</button>
+  </div>
+</div>
+
+<script>
+  const allProducts = [
+    {id:1, icon:"👟", brand:"Nike", name:"Air Zoom Pegasus 41", price:289000, cat:"Гүйлтийн", sale:true},
+    {id:2, icon:"👕", brand:"Adidas", name:"Techfit тренировкийн цамц", price:89000, cat:"Дайчлалт", sale:false},
+    {id:3, icon:"🩳", brand:"Puma", name:"DryCell гүйлтийн шорт", price:69000, cat:"Гүйлтийн", sale:true},
+    {id:4, icon:"🧥", brand:"Under Armour", name:"ColdGear хүйтний куртк", price:199000, cat:"Дайчлалт", sale:false},
+    {id:5, icon:"👟", brand:"New Balance", name:"Fresh Foam X 1080", price:349000, cat:"Гүйлтийн", sale:true},
+    {id:6, icon:"🎽", brand:"Nike", name:"Dri-FIT авто дуулга", price:45000, cat:"Гүйлтийн", sale:false},
+    {id:7, icon:"⚽", brand:"Adidas", name:"Predator Elite FG гутал", price:420000, cat:"Хөл бөмбөг", sale:true},
+    {id:8, icon:"🏀", brand:"Nike", name:"LeBron XXI сагсан гутал", price:379000, cat:"Сагсан бөмбөг", sale:false},
+    {id:9, icon:"🧢", brand:"Puma", name:"BMW Motorsport малгай", price:39000, cat:"Дайчлалт", sale:false},
+    {id:10, icon:"🩱", brand:"Speedo", name:"Fastskin усны гутал", price:85000, cat:"Усны спорт", sale:true},
+    {id:11, icon:"🥾", brand:"Salomon", name:"X Ultra 4 уулын гутал", price:399000, cat:"Уулын явган", sale:false},
+    {id:12, icon:"🎒", brand:"Nike", name:"Brasilia 9.5 спортын уут", price:129000, cat:"Дайчлалт", sale:true},
+  ];
+
+  const saleProducts = allProducts.filter(p => p.sale);
+  let cartItems = [];
+  let currentCat = 'Бүгд';
+
+  function fmt(n) { return '₮' + n.toLocaleString('mn-MN'); }
+
+  function renderProducts(list) {
+    const grid = document.getElementById('prod-grid');
+    grid.innerHTML = '';
+    if (!list.length) {
+      grid.innerHTML = '<p style="color:#aaa;font-size:14px">Бараа олдсонгүй</p>';
+      return;
+    }
+    list.forEach(p => {
+      const oldPrice = p.sale ? Math.round(p.price * 1.2) : null;
+      const card = document.createElement('div');
+      card.className = 'prod-card';
+      card.innerHTML = `
+        <div class="prod-img">${p.icon}</div>
+        <div class="prod-body">
+          <div class="prod-brand">${p.brand}</div>
+          <div class="prod-name">${p.name}</div>
+          <div class="prod-bottom">
+            <span class="prod-price">${fmt(p.price)}</span>
+            ${oldPrice ? `<span class="prod-old">${fmt(oldPrice)}</span>` : ''}
+            ${p.sale ? '<span class="badge-sale">Хямдрал</span>' : ''}
+          </div>
+          <button class="add-btn" id="btn-${p.id}" onclick="addToCart(${p.id})">+ Сагсанд нэмэх</button>
+        </div>`;
+      grid.appendChild(card);
+    });
+  }
+
+  function filterCat(cat) {
+    currentCat = cat;
+    document.querySelectorAll('.cat-pill').forEach(p => {
+      p.classList.toggle('active', p.textContent.trim() === cat || (cat === 'Бүгд' && p.textContent.trim() === 'Бүгд'));
+    });
+    const list = cat === 'Бүгд' ? allProducts : cat === 'Акц' ? saleProducts : allProducts.filter(p => p.cat === cat);
+    document.getElementById('section-label').textContent = cat === 'Бүгд' ? 'Онцлох бүтээгдэхүүн' : cat;
+    renderProducts(list);
+  }
+
+  function addToCart(id) {
+    const p = allProducts.find(x => x.id === id);
+    cartItems.push(p);
+    updateCartCount();
+    const btn = document.getElementById('btn-' + id);
+    if (btn) {
+      btn.textContent = 'Нэмэгдлээ ✓';
+      btn.classList.add('added');
+      setTimeout(() => { btn.textContent = '+ Сагсанд нэмэх'; btn.classList.remove('added'); }, 1400);
+    }
+  }
+
+  function updateCartCount() {
+    document.getElementById('cart-count').textContent = cartItems.length;
+  }
+
+  function openCart() {
+    document.getElementById('cart-overlay').classList.add('open');
+    document.getElementById('cart-drawer').classList.add('open');
+    renderCart();
+  }
+
+  function closeCart() {
+    document.getElementById('cart-overlay').classList.remove('open');
+    document.getElementById('cart-drawer').classList.remove('open');
+  }
+
+  function renderCart() {
+    const el = document.getElementById('cart-items');
+    const empty = document.getElementById('cart-empty');
+    if (!cartItems.length) {
+      el.innerHTML = '<div class="cart-empty">Сагс хоосон байна</div>';
+      document.getElementById('cart-total').textContent = '₮0';
+      return;
+    }
+    el.innerHTML = '';
+    cartItems.forEach((p, i) => {
+      const item = document.createElement('div');
+      item.className = 'cart-item';
+      item.innerHTML = `
+        <div class="cart-item-icon">${p.icon}</div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${p.name}</div>
+          <div class="cart-item-price">${fmt(p.price)}</div>
+        </div>
+        <button class="cart-item-rm" onclick="removeItem(${i})">×</button>`;
+      el.appendChild(item);
+    });
+    const total = cartItems.reduce((s, x) => s + x.price, 0);
+    document.getElementById('cart-total').textContent = fmt(total);
+  }
+
+  function removeItem(i) {
+    cartItems.splice(i, 1);
+    updateCartCount();
+    renderCart();
+  }
+
+  document.getElementById('cart-btn').addEventListener('click', openCart);
+
+  document.getElementById('search-inp').addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    if (!q) { filterCat(currentCat); return; }
+    const list = allProducts.filter(p => p.name.toLowerCase().includes(q) || p.brand.toLowerCase().includes(q));
+    document.getElementById('section-label').textContent = 'Хайлтын үр дүн';
+    renderProducts(list);
+  });
+
+  renderProducts(allProducts);
+</script>
+</body>
+</html>
